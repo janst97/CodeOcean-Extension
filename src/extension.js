@@ -1,8 +1,13 @@
 const path = require('path');
 const vscode = require('vscode');
 
+const {
+	file_exists,
+	copy_content,
+	get_file_attributes,
+	evaluate_assignment,
+} = require('./utils');
 const generateHtml = require('./webview');
-const { get_file_contents, copy_exercise_content, evaluate_assignment } = require('./utils');
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -19,28 +24,27 @@ function activate(context) {
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const coFilePath = vscode.Uri.joinPath(workspaceFolders[0].uri, '.co');
 
-    try {
-			// Check if .co file exists
-			await vscode.workspace.fs.stat(coFilePath);
-			const contents = await get_file_contents(coFilePath);
+		const coFileExists = await file_exists(coFilePath);
 
-			const exerciseFilePath = vscode.Uri.joinPath(workspaceFolders[0].uri, contents.exerciseFile);
-			const exerciseContent = await copy_exercise_content(exerciseFilePath);
+		if (!coFileExists) {
+			vscode.window.showErrorMessage('.co file does not exist in the workspace.');
+			return;
+		}
 
-			// Evaluate exercise
-			const res = await evaluate_assignment(contents, exerciseContent);
+		const coFileContents = await copy_content(coFilePath);
+		const contents = await get_file_attributes(coFileContents);
 
-			// Show the results in a webview	
-			createOrShowWebview(res);
+		// make sure the contents are not empty
+		if (!contents) return;
 
-			vscode.window.showInformationMessage('Assessment done!');
-    } catch (error) {
-			if (error.code === 'FileNotFound') {
-					vscode.window.showWarningMessage('.co file does not exist in the workspace.');
-			} else {
-					vscode.window.showErrorMessage(`Error checking for .co file: ${error.message}`);
-			}
-    }
+		// Evaluate exercise
+		const res = await evaluate_assignment(contents);
+
+		// Show the results in a webview if the evaluation is successful
+		if (!res) return;
+
+		createOrShowWebview(res);
+		vscode.window.showInformationMessage('Assessment done!');
 	})
 
 	context.subscriptions.push(eval_disposable);
