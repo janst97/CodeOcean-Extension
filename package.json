@@ -12,10 +12,28 @@
   "activationEvents": [],
   "main": "./src/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "assessBar",
+          "title": "CodeOcean",
+          "icon": "resources/codeocean-nobg.png"
+        }
+      ]
+    },
+    "views": {
+      "assessBar": [
+        {
+          "id": "myView",
+          "type": "webview",
+          "name": "Assessement"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "codeocean.assess",
-        "title": "CodeOcean Assess"
+        "title": "CodeOcean Assess",
+        "command": "codeocean.assess"
       }
     ]
   },

@@ -2,6 +2,28 @@ const axios = require('axios');
 const vscode = require('vscode');
 
 
+const parseError = (data) => {
+  const separator = '----------------------------------------------------------------------';
+
+  const testBlocks = data.split(separator);
+  const parsedResults = testBlocks.map((block) => {
+      const testMatch = block.match(/FAIL: (\S+) \((.+?)\)/);
+      const descriptionMatch = block.match(/Test description: (.+?)\n/);
+      const errorMatch = block.match(/AssertionError: (.+?)\n/);
+
+      if (testMatch && descriptionMatch && errorMatch) {
+          return {
+              Test: `${testMatch[1]} (${testMatch[2]})`,
+              TaskDescription: descriptionMatch[1].trim(),
+              Error: errorMatch[1].trim()
+          };
+      }
+      return null;
+  }).filter(Boolean);
+
+  return parsedResults;
+}
+
 const file_exists = async (filePath) => {
   try {
     await vscode.workspace.fs.stat(filePath);
@@ -92,6 +114,7 @@ const evaluate_assignment = async (contents) => {
 }
 
 module.exports = {
+  parseError,
   file_exists,
   copy_content,
   get_file_attributes,
