@@ -1,5 +1,4 @@
 node_modules
 .vscode-test/
-*.vsix
 *.bak
 vsc-extension-quickstart.md

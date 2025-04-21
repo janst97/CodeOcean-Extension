@@ -43,4 +43,4 @@ If you are not installing from the VS Code Marketplace and want to use the bundl
    Alternatively, install via terminal:
 
    ```bash
-   code --install-extension codeocean-extension-x.y.z.vsix
+   code --install-extension codeocean-extension-0.0.1.vsix
