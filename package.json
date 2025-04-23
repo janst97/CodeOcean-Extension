@@ -1,16 +1,21 @@
 {
-  "name": "codeocean",
-  "displayName": "codeocean",
+  "name": "codeocean-vscode",
+  "displayName": "CodeOcean-VSCode",
   "description": "Automatic code assessment",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
-    "vscode": "^1.96.0"
+    "vscode": "^1.99.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janst97/CodeOcean-Extension"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [],
-  "main": "./src/extension.js",
+  "browser": "./dist/web/extension.js",
+  "_main": "./src_server/extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -26,7 +31,8 @@
         {
           "id": "myView",
           "type": "webview",
-          "name": "Assessement"
+          "name": "Assessement",
+          "icon": "resources/codeocean.png"
         }
       ]
     },
@@ -34,23 +40,40 @@
       {
         "title": "CodeOcean Assess",
         "command": "codeocean.assess"
+      },
+      {
+        "title": "CodeOcean: Testing unzip",
+        "command": "codeocean.unzip"
       }
     ]
   },
   "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
+    "test": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/index.js",
+    "pretest": "npm run compile-web",
+    "vscode:prepublish": "npm run package-web",
+    "compile-web": "webpack",
+    "watch-web": "webpack --watch",
+    "package-web": "webpack --mode production --devtool hidden-source-map",
+    "lint": "eslint src",
+    "run-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ."
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.9",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.96.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.13.0"
-  },
-  "dependencies": {
-    "axios": "^1.7.9"
+    "@types/assert": "^1.5.11",
+    "@types/mocha": "^10.0.10",
+    "@types/vscode": "^1.99.0",
+    "@types/webpack-env": "^1.18.8",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "@vscode/test-web": "^0.0.68",
+    "@vscode/vsce": "^3.3.2",
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
+    "eslint": "^9.23.0",
+    "mocha": "^11.1.0",
+    "process": "^0.11.10",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
   }
 }

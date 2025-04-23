@@ -1,4 +1,5 @@
+out
+dist
 node_modules
-.vscode-test/
-*.bak
-vsc-extension-quickstart.md
+.vscode-test-web/
+*.vsix

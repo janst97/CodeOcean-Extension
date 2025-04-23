@@ -37,7 +37,6 @@ class SideViewProvider {
       </body>
       </html>`;
   }
-  
 }
 
 module.exports = { SideViewProvider };

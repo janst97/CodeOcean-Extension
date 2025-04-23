@@ -71,18 +71,7 @@ const generateHtml = (testResults, exercise) => {
                         <p><strong>Score:</strong> ${test.passed} out of ${test.weight}</p>
                         <p><strong>Feedback:</strong> ${test.message}</p>
                         <p><strong>Error Messages:</strong> ${
-                            test.failed > 0
-                                ?
-                                // test.stderr
-                                parseError(test.stderr).map((result, index) => {
-                                    return `
-                                    <p><strong>Test ${index+1}:</strong> ${result.Test}</p>
-                                    <p><strong>Task Description:</strong> ${result.TaskDescription}</p>
-                                    <p><strong>Error:</strong> ${result.Error}</p>
-                                    </br>
-                                    `;
-                                }).join('')
-                                : "&mdash;"
+                            test.failed > 0 ? test.error_messages.map((msg) => "<p>" + msg + "</p>").join(" ") : ""
                         }</p>
                         <p><strong>Score: ${scorePercentage}%</strong></p>
                         <div class="score-bar" style="width: ${scorePercentage}%;"></div>

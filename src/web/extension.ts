@@ -1,23 +1,23 @@
-const path = require('path');
-const vscode = require('vscode');
+// The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
+import * as vscode from 'vscode';
 
-const {
+import {
 	parseError,
 	file_exists,
 	copy_content,
-	get_file_attributes,
+	get_assignment_info,
 	evaluate_assignment,
-} = require('./utils');
+	sendDownloadRequest,
+	downloadZip
+} from './utils';
+
 const generateHtml = require('./webview');
 const { SideViewProvider } = require('./sideview');
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
+export function activate(context: vscode.ExtensionContext) {
 	const provider = new SideViewProvider(context, performAssessment);
 
 	context.subscriptions.push(
@@ -27,17 +27,15 @@ function activate(context) {
 	// Assess Assignment
 	const eval_disposable = vscode.commands.registerCommand('codeocean.assess', async () => {
 		performAssessment();
-	})
+	});
 
 	context.subscriptions.push(eval_disposable);
 }
 
-function deactivate() {}
+let currentPanel : any;
 
-let currentPanel;
-
-async function performAssessment() { 
-	const workspaceFolders = vscode.workspace.workspaceFolders;
+async function performAssessment() {
+	const workspaceFolders = vscode.workspace.workspaceFolders as any;
 
 	// Get the first workspace folder path
 	const workspacePath = workspaceFolders[0].uri.fsPath;
@@ -51,7 +49,7 @@ async function performAssessment() {
 	}
 
 	const coFileContents = await copy_content(coFilePath);
-	const contents = await get_file_attributes(coFileContents);
+	const contents = await get_assignment_info(coFileContents);
 
 	// make sure the contents are not empty
 	if (!contents) return;
@@ -65,7 +63,7 @@ async function performAssessment() {
 	const exerciseContent = await copy_content(exerciseFilePath);
 
 	const exerciseContents = exerciseContent.split('======================');
-	
+
 	const exercise = {
 		title: exerciseContents[0],
 		description: exerciseContents[1],
@@ -82,7 +80,7 @@ async function performAssessment() {
 }
 
 
-function createOrShowWebview(res, exercise) {
+function createOrShowWebview(res : any, exercise : any) {
 	if (currentPanel) {
 			// If a panel is already open, reveal it and update its content
 			currentPanel.reveal(currentPanel.viewColumn, true); // Use `preserveFocus: true`
@@ -105,7 +103,5 @@ function createOrShowWebview(res, exercise) {
 	}
 }
 
-module.exports = {
-	activate,
-	deactivate
-}
+// This method is called when your extension is deactivated
+export function deactivate() {}
