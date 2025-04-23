@@ -7,9 +7,7 @@ import {
 	file_exists,
 	copy_content,
 	get_assignment_info,
-	evaluate_assignment,
-	sendDownloadRequest,
-	downloadZip
+	evaluate_assignment
 } from './utils';
 
 const generateHtml = require('./webview');

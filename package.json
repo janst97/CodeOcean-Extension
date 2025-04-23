@@ -40,10 +40,6 @@
       {
         "title": "CodeOcean Assess",
         "command": "codeocean.assess"
-      },
-      {
-        "title": "CodeOcean: Testing unzip",
-        "command": "codeocean.unzip"
       }
     ]
   },
