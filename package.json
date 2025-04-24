@@ -13,9 +13,9 @@
   "categories": [
     "Other"
   ],
+  "icon": "resources/codeocean.png",
   "activationEvents": [],
   "browser": "./dist/web/extension.js",
-  "_main": "./src_server/extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [

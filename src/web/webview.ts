@@ -1,6 +1,6 @@
-const { parseError } = require('./utils');
+import { CodeOceanTestResult, ExerciseInfo, parseError } from "./utils";
 
-const generateHtml = (testResults, exercise) => {
+export const generateHtml = (testResults : [CodeOceanTestResult], exercise : ExerciseInfo) => {
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -82,6 +82,4 @@ const generateHtml = (testResults, exercise) => {
         </body>
         </html>
     `;
-}
-
-module.exports = generateHtml;
+};

@@ -5,7 +5,7 @@ var Buffer = require('buffer/').Buffer;
 
 interface AssignmentInfo {
   evaluationUrl : string,
-  fileAttributes : Map<number, FileAttribute>,
+  fileAttributes : { [id: number] : FileAttribute},
   validationToken : string
 }
 
@@ -16,7 +16,7 @@ interface FileAttribute {
 
 interface RemoteEvaluationType {
   validation_token: string,
-  files_attributes: Map<number, FileAttribute>
+  files_attributes: { [id: number] : FileAttribute}
 }
 
 interface CodeOceanEvalRequest {
@@ -29,10 +29,28 @@ interface ParseError {
   Error : string
 }
 
-interface DownloadResponse {
-  id: number,
-  files: [],
-  render_url: [any],
+export interface ExerciseInfo {
+  title: string,
+  description: string,
+}
+
+export interface CodeOceanTestResult {
+  file_role: string,
+  waiting_for_container_time: number,
+  stdout: string,
+  stderr: string,
+  exit_code: number,
+  container_execution_time: number,
+  status: string,
+  count: number,
+  failed: number,
+  error_messages: [string]
+  passed: number,
+  score: number,
+  filename: string,
+  message: string
+  weight: number,
+  hidden_feedback: boolean
 }
 
 export const parseError = (data : string) : (ParseError | null)[] => {
@@ -57,6 +75,18 @@ export const parseError = (data : string) : (ParseError | null)[] => {
   return parsedResults;
 };
 
+export const get_exercise_file = async (basedir : Uri) : Promise<Uri|null> => {
+  const exercise_file_names = ['Aufgabe.txt', 'Exercise.txt'];
+
+  for(name of exercise_file_names) {
+    const exerciseFilePath = vscode.Uri.joinPath(basedir, name);
+    if(await file_exists(exerciseFilePath)) {
+      return exerciseFilePath;
+    }
+  }
+  return null;
+};
+
 export const file_exists = async (filePath : Uri) : Promise<boolean> => {
   try {
     await vscode.workspace.fs.stat(filePath);
@@ -73,7 +103,7 @@ export const get_assignment_info = async (coFileContents : string) : Promise<Ass
   const contents = coFileContents.split('\n');
   const contentsLength = contents.length - 1;
 
-  let fileAttributes = new Map<number, FileAttribute>();
+  let fileAttributes : { [id: number] : FileAttribute} = {};
 
   try {
     // Loop through the .co file contents and get the file attributes
@@ -90,21 +120,21 @@ export const get_assignment_info = async (coFileContents : string) : Promise<Ass
       const exerciseFileExists = await file_exists(exerciseFilePath);
 
       // throw error is file doesn't exist
-      if (!exerciseFileExists) throw new Error(`Exercise file ${fileName} not found.`);
+      if (!exerciseFileExists) {throw new Error(`Exercise file ${fileName} not found.`);}
 
       const exerciseContent = await copy_content(exerciseFilePath);
 
-      fileAttributes.set(fileAttrIndex, {
+      fileAttributes[fileAttrIndex] = {
         'file_id': fileId,
         content: exerciseContent
-      });
+      };
     }
 
     return {
       fileAttributes,
       evaluationUrl: contents[1],
       validationToken: contents[0],
-    }
+    };
   } catch (error : any) {
     vscode.window.showErrorMessage(error.message);
     return null;
@@ -118,7 +148,7 @@ export const copy_content = async (file : Uri) : Promise<string> => {
   return decodedContent;
 };
 
-export const evaluate_assignment = async (contents : AssignmentInfo) : Promise<any> => {
+export const evaluate_assignment = async (contents : AssignmentInfo) : Promise<[CodeOceanTestResult]|null> => {
   const {
     evaluationUrl,
     fileAttributes,
@@ -136,7 +166,7 @@ export const evaluate_assignment = async (contents : AssignmentInfo) : Promise<a
   return sendEvalPostRequest(evaluationUrl, data);
 };
 
-const sendEvalPostRequest = (url : string, data : CodeOceanEvalRequest) : Promise<string> => {
+const sendEvalPostRequest = (url : string, data : CodeOceanEvalRequest) : Promise<[CodeOceanTestResult]|null> => {
   return new Promise(function (resolve, reject) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
@@ -149,8 +179,7 @@ const sendEvalPostRequest = (url : string, data : CodeOceanEvalRequest) : Promis
     xhr.onload = () => {
       if (xhr.status === 201) {
           try {
-            let jsonResponse = JSON.parse(xhr.response);
-            resolve(jsonResponse);
+            resolve(xhr.response);
           } catch (_e) {
             vscode.window.showErrorMessage("Unexpected response from CodeOcean!");
             reject(null);
