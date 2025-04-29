@@ -3,6 +3,7 @@
   "displayName": "CodeOcean: VS Code integration",
   "description": "Automatic code assessment",
   "version": "0.0.2",
+  "publisher": "tu-ilmenau",
   "engines": {
     "vscode": "^1.99.0"
   },
