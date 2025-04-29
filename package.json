@@ -1,6 +1,6 @@
 {
   "name": "codeocean-vscode",
-  "displayName": "CodeOcean-VSCode",
+  "displayName": "CodeOcean: VS Code integration",
   "description": "Automatic code assessment",
   "version": "0.0.2",
   "engines": {
